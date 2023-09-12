@@ -37,6 +37,7 @@ class WebServer(private val activity: Activity) : NanoHTTPD(8080) {
             uri.endsWith(".css") -> "text/css"
             uri.endsWith(".js") -> "application/javascript"
             uri.endsWith(".png") -> "image/png"
+            uri.endsWith(".svg") -> "image/svg+xml"
             uri.endsWith(".jpg") || uri.endsWith(".jpeg") -> "image/jpeg"
             else -> MIME_PLAINTEXT
         }
