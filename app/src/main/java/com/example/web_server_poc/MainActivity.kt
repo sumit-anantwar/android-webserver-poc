@@ -7,34 +7,34 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.webkit.WebView
+import android.widget.TextView
 import com.example.web_server_poc.databinding.ActivityMainBinding
 import com.example.web_server_poc.webserver.WebServer
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-    private lateinit var webView: WebView
+    private lateinit var textview_IP: TextView
 
     private var webServer: WebServer? = null
 
+    private val port = 8080
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        webView = binding.webView
+        textview_IP = binding.textviewIp
 
-        webServer = WebServer(this)
+        webServer = WebServer(this, port)
         try {
             webServer?.start()
         } catch (e: Exception) {
             e.printStackTrace()
         }
 
-        webView.loadUrl("http://localhost:8080/index.html")
-
         val ipAddress = getLocalIpAddress(this)
-        Log.d("TAG", ipAddress ?: "IP ADDRESS NOT FOUND")
+        textview_IP.text = String.format("%s:%d", ipAddress, port)
     }
 
     override fun onDestroy() {
