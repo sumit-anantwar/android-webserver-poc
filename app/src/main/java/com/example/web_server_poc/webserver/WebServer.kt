@@ -5,6 +5,7 @@ import android.util.Base64
 import android.util.Log
 import com.example.web_server_poc.utils.JsonSerializer
 import fi.iki.elonen.NanoHTTPD
+import fi.iki.elonen.NanoHTTPD.Response
 import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
@@ -17,9 +18,22 @@ import kotlin.reflect.KClass
 @Serializable
 open class JsonMappable {
 }
+
+@Serializable
+data class SDP(
+    val type: String,
+    val sdp: String
+) : JsonMappable()
+
 @Serializable
 data class Offer(
-    val offer: String,
+    val offer: SDP,
+    val candidates: List<String>
+) : JsonMappable()
+
+@Serializable
+data class Answer(
+    val answer: SDP,
     val candidates: List<String>
 ) : JsonMappable()
 
@@ -47,7 +61,7 @@ class WebServer(private val activity: Activity, port: Int) : NanoHTTPD(port) {
             val cleanedBody= requestBody.replace("\n", "")
             return when(uri) {
                 "/offer" -> handleOffer(cleanedBody)
-                else -> newFixedLengthResponse(
+                else -> fixedLengthResponseWithCors(
                     Response.Status.NOT_FOUND, MIME_PLAINTEXT, "404 Not Found"
                 )
             }
@@ -66,12 +80,14 @@ class WebServer(private val activity: Activity, port: Int) : NanoHTTPD(port) {
             // Load file from assets and serve it
             val inputStream: InputStream = activity.assets.open(uri)
             val mimeType: String = getMimeTypeForF(uri)
-            return newChunkedResponse(Response.Status.OK, mimeType, inputStream)
+            return chunkedResponseWithCors(
+                Response.Status.OK, mimeType, inputStream
+            ).also(Response::addCors)
         } catch (e: IOException) {
             e.printStackTrace()
-            return newFixedLengthResponse(
+            return fixedLengthResponseWithCors(
                 Response.Status.NOT_FOUND, MIME_PLAINTEXT, "404 Not Found"
-            )
+            ).also(Response::addCors)
         }
     }
 
@@ -90,10 +106,36 @@ class WebServer(private val activity: Activity, port: Int) : NanoHTTPD(port) {
     private fun handleOffer(body: String): Response {
         val offer = JsonSerializer.decodeFromString<Offer>(body)
 
-        val responseJson = offer.toJsonString()
+        val answerSDP = SDP(
+            type = "answer",
+            sdp = offer.offer.sdp
+        )
 
-        return newFixedLengthResponse(
+        val answer = Answer(
+            answer = answerSDP,
+            candidates = offer.candidates
+        )
+
+        val responseJson = answer.toJsonString()
+
+        return fixedLengthResponseWithCors(
             Response.Status.OK, "application/json", responseJson
         )
     }
+
+    private fun fixedLengthResponseWithCors(status: Response.IStatus, mimeType: String, txt: String): Response {
+        return newFixedLengthResponse(status, mimeType, txt)
+            .also(Response::addCors)
+    }
+
+    private fun chunkedResponseWithCors(status: Response.IStatus, mimeType: String, data: InputStream): Response {
+        return newChunkedResponse(status, mimeType, data)
+            .also(Response::addCors)
+    }
+}
+
+fun Response.addCors() {
+    this.addHeader("Access-Control-Allow-Methods", "DELETE, GET, POST, PUT");
+    this.addHeader("Access-Control-Allow-Origin",  "*");
+    this.addHeader("Access-Control-Allow-Headers", "X-Requested-With");
 }
