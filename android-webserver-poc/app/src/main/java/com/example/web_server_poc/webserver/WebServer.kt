@@ -4,6 +4,7 @@ import android.app.Activity
 import android.util.Base64
 import android.util.Log
 import com.example.web_server_poc.utils.JsonSerializer
+import com.example.web_server_poc.webrtc.WebRtcPresenter
 import fi.iki.elonen.NanoHTTPD
 import fi.iki.elonen.NanoHTTPD.Response
 import kotlinx.serialization.InternalSerializationApi
@@ -11,6 +12,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.serializer
+import org.webrtc.SessionDescription
 import java.io.IOException
 import java.io.InputStream
 import kotlin.reflect.KClass
@@ -29,7 +31,14 @@ data class SDP(
 data class Offer(
     val offer: SDP,
     val candidates: List<String>
-) : JsonMappable()
+) : JsonMappable() {
+    fun sdp(): SessionDescription {
+        return SessionDescription(
+            SessionDescription.Type.OFFER,
+            offer.sdp
+        )
+    }
+}
 
 @Serializable
 data class Answer(
@@ -46,7 +55,11 @@ inline fun <reified T : JsonMappable> T.toJsonString(): String {
 
 
 @OptIn(InternalSerializationApi::class)
-class WebServer(private val activity: Activity, port: Int) : NanoHTTPD(port) {
+class WebServer(
+    private val activity: Activity,
+    private val webRtcPresenter: WebRtcPresenter,
+    port: Int
+) : NanoHTTPD(port) {
     override fun serve(session: IHTTPSession): Response {
         val method = session.method
         var uri = session.uri
@@ -105,6 +118,8 @@ class WebServer(private val activity: Activity, port: Int) : NanoHTTPD(port) {
 
     private fun handleOffer(body: String): Response {
         val offer = JsonSerializer.decodeFromString<Offer>(body)
+
+        webRtcPresenter.createConnection(offer)
 
         val answerSDP = SDP(
             type = "answer",

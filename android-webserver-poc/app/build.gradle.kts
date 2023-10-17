@@ -48,8 +48,17 @@ dependencies {
     implementation("com.google.android.material:material:1.9.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
 
+    implementation("com.jakewharton.timber:timber:5.0.1")
+    // Rx
+    implementation("io.reactivex.rxjava3:rxjava:3.1.8")
+    implementation("io.reactivex.rxjava3:rxkotlin:3.0.1")
+    implementation("io.reactivex.rxjava3:rxandroid:3.0.2")
+
     // WebRTC
-    implementation("org.webrtc:google-webrtc:1.0.30039")
+//    implementation("io.getstream:stream-webrtc-android:1.0.7")
+//    implementation("io.github.webrtc-sdk:android:114.5735.05")
+//    implementation("org.webrtc:google-webrtc:1.0.30039")
+    implementation("com.dafruits:webrtc:117.0.0")
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
 

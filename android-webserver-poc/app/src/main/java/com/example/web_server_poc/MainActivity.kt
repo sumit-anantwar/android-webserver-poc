@@ -9,6 +9,7 @@ import android.util.Log
 import android.webkit.WebView
 import android.widget.TextView
 import com.example.web_server_poc.databinding.ActivityMainBinding
+import com.example.web_server_poc.webrtc.WebRtcPresenter
 import com.example.web_server_poc.webserver.WebServer
 
 class MainActivity : AppCompatActivity() {
@@ -26,7 +27,9 @@ class MainActivity : AppCompatActivity() {
 
         textview_IP = binding.textviewIp
 
-        webServer = WebServer(this, port)
+        val presenter = WebRtcPresenter(this)
+
+        webServer = WebServer(this, presenter, port)
         try {
             webServer?.start()
         } catch (e: Exception) {
