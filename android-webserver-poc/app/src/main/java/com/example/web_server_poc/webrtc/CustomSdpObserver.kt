@@ -5,7 +5,7 @@ import org.webrtc.SessionDescription
 import timber.log.Timber
 
 open class CustomSdpObserver : SdpObserver {
-    override fun onCreateSuccess(p0: SessionDescription) {
+    override fun onCreateSuccess(sdp: SessionDescription) {
         Timber.d("SDP Created Successfully")
     }
 
@@ -13,11 +13,11 @@ open class CustomSdpObserver : SdpObserver {
         Timber.d("SDP Set Successfuly")
     }
 
-    override fun onCreateFailure(p0: String?) {
-        Timber.e("SDP Creation Failure")
+    override fun onCreateFailure(error: String) {
+        Timber.e("SDP Creation Error: $error")
     }
 
-    override fun onSetFailure(p0: String?) {
-        Timber.e("SDP Set Failure")
+    override fun onSetFailure(error: String) {
+        Timber.e("SDP Set Error: $error")
     }
 }

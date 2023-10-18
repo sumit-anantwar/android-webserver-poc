@@ -1,13 +1,16 @@
 package com.example.web_server_poc.webrtc
 
 import android.content.Context
-import com.example.web_server_poc.webserver.Answer
-import com.example.web_server_poc.webserver.Offer
+import com.example.web_server_poc.webserver.Candidate
+import com.example.web_server_poc.webserver.SdpPacket
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.Observables
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.subjects.PublishSubject
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.webrtc.AudioTrack
 import org.webrtc.IceCandidate
 import org.webrtc.MediaStream
@@ -16,24 +19,31 @@ import org.webrtc.PeerConnectionFactory
 import org.webrtc.RtpReceiver
 import org.webrtc.SessionDescription
 import timber.log.Timber
+import java.lang.Exception
 import java.util.concurrent.TimeUnit
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
 class WebRtcPeerConnection(
     context: Context,
-    private val offer: Offer,
+    private val offer: SdpPacket,
     private val peerConnectionFactory: PeerConnectionFactory,
     private val audioTrack: AudioTrack,
-    private val onAnswer: (Answer) -> Unit,
-    private val onConnected: () -> Unit,
-    private val onDisconnected: () -> Unit,
+    private val statusCallback: StatusCallback,
+    private val onAnswer: (SdpPacket) -> Unit,
 ) {
+    interface StatusCallback {
+        fun onDisconnected(connection: WebRtcPeerConnection)
+    }
+
     private val disposables = CompositeDisposable()
 
     private val candidates = mutableListOf<IceCandidate>()
 
     private var localPeer: PeerConnection? = null
 
-    private val answerPublisher = PublishSubject.create<String>()
+    private val answerPublisher = PublishSubject.create<SessionDescription>()
     private val candidatePublisher = PublishSubject.create<List<IceCandidate>>()
 
     init {
@@ -58,8 +68,7 @@ class WebRtcPeerConnection(
                 override fun onIceConnectionChange(iceConnectionState: PeerConnection.IceConnectionState) {
                     super.onIceConnectionChange(iceConnectionState)
                     if (iceConnectionState == PeerConnection.IceConnectionState.FAILED) {
-                        onDisconnected()
-//                        listener.onConnectionLost(this@WebRtcPresenterHandler)
+                        statusCallback.onDisconnected(this@WebRtcPeerConnection)
                     }
                 }
             }
@@ -70,15 +79,24 @@ class WebRtcPeerConnection(
             .subscribeBy(
                 onError = Timber::e,
                 onNext = {
-                    Timber.d(it.toString())
+                    Timber.d("Response Packet Complete: $it")
                 }
             ).addTo(disposables)
 
-        localPeer?.setRemoteDescription(CustomSdpObserver(), offer.sdp())
-//        offer.candidates.forEach {
-//            IceCandidate()
-//            localPeer?.addIceCandidate()
-//        }
+        runBlocking {
+            launch {
+                localPeer?.setRemoteDescription(CustomSdpObserver(), offer.sdp())
+                val candidates = offer.candidates()
+                Timber.d("Number of candidates: ${candidates.count()}")
+                for (candidate in candidates) {
+                    localPeer?.addIceCandidate(candidate, CustomAddIceObserver())
+                    delay(1000)
+                }
+            }
+        }
+
+//        localPeer?.createAnswer()
+        Timber.d("Method complete")
     }
 
     // region === PRIVATE ===

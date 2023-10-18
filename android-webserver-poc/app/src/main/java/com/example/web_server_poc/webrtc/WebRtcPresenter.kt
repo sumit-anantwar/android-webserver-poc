@@ -1,8 +1,11 @@
 package com.example.web_server_poc.webrtc
 
 import android.content.Context
-import com.example.web_server_poc.webserver.Offer
+import com.example.web_server_poc.webserver.SdpPacket
 import org.webrtc.AudioTrack
+import timber.log.Timber
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 
 class WebRtcPresenter(
@@ -16,15 +19,26 @@ class WebRtcPresenter(
 
     private val peerConnections = mutableListOf<WebRtcPeerConnection>()
 
-    fun createConnection(offer: Offer) {
-        val peerConnection = WebRtcPeerConnection(
-            context, offer, peerConnectionFactory, localAudioTrack,
-            onAnswer = {},
-            onConnected = {},
-            onDisconnected = {}
-        )
+    private val connectionStatusCallback = object : WebRtcPeerConnection.StatusCallback {
+        override fun onDisconnected(connection: WebRtcPeerConnection) {
+            Timber.d("Peer Disconnected")
+        }
+    }
 
-        peerConnections.add(peerConnection)
+    suspend fun createConnection(offer: SdpPacket): SdpPacket {
+        val answer = suspendCoroutine { continuation ->
+            val peerConnection = WebRtcPeerConnection(
+                context, offer, peerConnectionFactory, localAudioTrack,
+                statusCallback = connectionStatusCallback,
+                onAnswer = {
+                    continuation.resume(it)
+                },
+            )
+
+            peerConnections.add(peerConnection)
+        }
+
+        return answer
     }
 
 

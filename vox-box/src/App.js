@@ -28,24 +28,24 @@ function App() {
 
 
     /* getUserMedia end */
-   
+
     const _pc = new RTCPeerConnection(null)
-    
+
     navigator.mediaDevices.getUserMedia(constraints)
-    .then(stream=>{
-      // display audio/video
-      localAudioRef.current.srcObject = stream
-      stream.getTracks().forEach(track => {
-        _pc.addTrack(track, stream)
+      .then(stream => {
+        // display audio/video
+        localAudioRef.current.srcObject = stream
+        stream.getTracks().forEach(track => {
+          _pc.addTrack(track, stream)
+        })
       })
-    })
-    .catch(e =>{
-      console.log("error occured:", e)
-    })
-   
+      .catch(e => {
+        console.log("error occured:", e)
+      })
+
     _pc.onicecandidate = (e) => {
       if (e.candidate) {
-        console.log("icecandidates here:"+ JSON.stringify(e.candidate))
+        console.log("icecandidates here:" + JSON.stringify(e.candidate))
         iceCandidatesRef.current.push(e.candidate)
       }
     }
@@ -58,29 +58,29 @@ function App() {
       // we got remote stream
       remoteAudioRef.current.srcObject = e.streams[0]
     }
-  
+
     pc.current = _pc
-    
+
     return () => {
       // cleanup
     }
   }, [])
-  
+
   const createOffer = () => {
     pc.current.createOffer({
-      offerToReceiveVideo:1, // optional .. not needed to give
-      offerToReceiveAudio:1, // optional .. not needed to give
+      offerToReceiveVideo: 0, // optional .. not needed to give
+      offerToReceiveAudio: 1, // optional .. not needed to give
     }).then(sdp => {
       console.log(JSON.stringify(sdp))
       pc.current.setLocalDescription(sdp)
       textAreaRef.current.value = JSON.stringify(sdp)
     }).catch(e => console.log(e))
   }
- 
+
   const rTChandshake = () => {
     pc.current.createOffer({
-      offerToReceiveVideo:1, // optional .. not needed to give
-      offerToReceiveAudio:1, // optional .. not needed to give
+      offerToReceiveVideo: 0, // optional .. not needed to give
+      offerToReceiveAudio: 1, // optional .. not needed to give
     }).then(sdp => {
       console.log(JSON.stringify(sdp))
       pc.current.setLocalDescription(sdp)
@@ -89,7 +89,7 @@ function App() {
     }).then(sdpData => {
       const offerSdpAndCandidates = {
         icecandidates: iceCandidatesRef.current,
-        sdp: sdpData 
+        sdp: sdpData
       }
       console.log("offerSdpAndCandidates:" + JSON.stringify(offerSdpAndCandidates))
 
@@ -104,20 +104,20 @@ function App() {
   }
   const createAnswer = () => {
     pc.current.createAnswer({
-      offerToReceiveVideo:1, // optional .. not needed to give
-      offerToReceiveAudio:1, // optional .. not needed to give
+      offerToReceiveVideo: 1, // optional .. not needed to give
+      offerToReceiveAudio: 1, // optional .. not needed to give
     }).then(sdp => {
       console.log(JSON.stringify(sdp))
       pc.current.setLocalDescription(sdp)
     }).catch(e => console.log(e))
   }
-  
+
   const setRemoteDescription = () => {
     const sdp = JSON.parse(textAreaRef.current.value)
     console.log(sdp)
     pc.current.setRemoteDescription(new RTCSessionDescription(sdp))
   }
-  
+
   const addCandidate = () => {
     const candidate = JSON.parse(textAreaRef.current.value)
     console.log('Adding candidate...', candidate)
@@ -125,29 +125,29 @@ function App() {
   }
 
   return (
-    <div style = {{margin:10}}>
+    <div style={{ margin: 10 }}>
       <video style={{
-        width:240, height:240,
-        margin:5, backgroundColor:"black"
-      }} 
-      ref={localAudioRef} autoPlay></video>
+        width: 240, height: 240,
+        margin: 5, backgroundColor: "black"
+      }}
+        ref={localAudioRef} autoPlay></video>
       <video style={{
-        width:240, height:240,
-        margin:5, backgroundColor:"black"
-      }} 
-      ref={remoteAudioRef} autoPlay></video>
-      <br/>
+        width: 240, height: 240,
+        margin: 5, backgroundColor: "black"
+      }}
+        ref={remoteAudioRef} autoPlay></video>
+      <br />
       {/* <button onClick={createOffer}>Create Offer</button> */}
       <button onClick={rTChandshake}>Create Offer</button>
       <button onClick={createAnswer}>Create Answer</button>
-      <br/>
+      <br />
       <textarea ref={textAreaRef}></textarea>
-      <br/>
+      <br />
       <button onClick={setRemoteDescription}>Set Remote Description</button>
       <button onClick={addCandidate}>Add Candidates</button>
-      <br/>
+      <br />
       <textarea ref={responseTextAreaRef}></textarea>
-      <br/>
+      <br />
     </div>
   );
 }
