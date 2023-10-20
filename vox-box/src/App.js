@@ -31,17 +31,17 @@ function App() {
 
     const _pc = new RTCPeerConnection(null)
 
-    navigator.mediaDevices.getUserMedia(constraints)
-      .then(stream => {
-        // display audio/video
-        localAudioRef.current.srcObject = stream
-        stream.getTracks().forEach(track => {
-          _pc.addTrack(track, stream)
-        })
-      })
-      .catch(e => {
-        console.log("error occured:", e)
-      })
+    // navigator.mediaDevices.getUserMedia(constraints)
+    //   .then(stream => {
+    //     // display audio/video
+    //     localAudioRef.current.srcObject = stream
+    //     stream.getTracks().forEach(track => {
+    //       _pc.addTrack(track, stream)
+    //     })
+    //   })
+    //   .catch(e => {
+    //     console.log("error occured:", e)
+    //   })
 
     _pc.onicecandidate = (e) => {
       if (e.candidate) {
@@ -69,7 +69,7 @@ function App() {
   const createOffer = () => {
     pc.current.createOffer({
       offerToReceiveVideo: 0, // optional .. not needed to give
-      offerToReceiveAudio: 1, // optional .. not needed to give
+      offerToReceiveAudio: 0, // optional .. not needed to give
     }).then(sdp => {
       console.log(JSON.stringify(sdp))
       pc.current.setLocalDescription(sdp)
@@ -80,7 +80,7 @@ function App() {
   const rTChandshake = () => {
     pc.current.createOffer({
       offerToReceiveVideo: 0, // optional .. not needed to give
-      offerToReceiveAudio: 1, // optional .. not needed to give
+      offerToReceiveAudio: 0, // optional .. not needed to give
     }).then(sdp => {
       console.log(JSON.stringify(sdp))
       pc.current.setLocalDescription(sdp)

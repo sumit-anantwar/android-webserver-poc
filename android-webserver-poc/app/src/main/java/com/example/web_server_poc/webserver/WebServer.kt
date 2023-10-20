@@ -1,20 +1,15 @@
 package com.example.web_server_poc.webserver
 
 import android.app.Activity
-import android.util.Base64
 import android.util.Log
 import com.example.web_server_poc.utils.JsonSerializer
 import com.example.web_server_poc.webrtc.WebRtcPresenter
 import fi.iki.elonen.NanoHTTPD
 import fi.iki.elonen.NanoHTTPD.Response
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.InternalSerializationApi
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.serializer
 import org.webrtc.IceCandidate
 import org.webrtc.SessionDescription
@@ -38,13 +33,12 @@ data class Candidate(
     val candidate: String,
     val sdpMid: String,
     val sdpMLineIndex: Int,
-    val usernameFragment: String,
 ) : JsonMappable()
 
 @Serializable
 data class SdpPacket(
     val sdp: SDP,
-    val icecandidates: List<Candidate>
+    val icecandidates: List<Candidate>,
 ) : JsonMappable() {
     fun sdp(): SessionDescription {
         return SessionDescription(
@@ -67,7 +61,7 @@ data class SdpPacket(
 @Serializable
 data class Answer(
     val answer: SDP,
-    val candidates: List<String>
+    val candidates: List<String>,
 ) : JsonMappable()
 
 @Suppress("UNCHECKED_CAST")
@@ -82,7 +76,7 @@ inline fun <reified T : JsonMappable> T.toJsonString(): String {
 class WebServer(
     private val activity: Activity,
     private val webRtcPresenter: WebRtcPresenter,
-    port: Int
+    port: Int,
 ) : NanoHTTPD(port) {
     override fun serve(session: IHTTPSession): Response {
         val method = session.method
@@ -95,9 +89,9 @@ class WebServer(
             session.parseBody(request)
 
             val requestBody = request["postData"]!!
-            val cleanedBody= requestBody.replace("\n", "")
-            return when(uri) {
-                "/offer" -> handleOffer(cleanedBody)
+            val cleanedBody = requestBody.replace("\n", "")
+            return when (uri) {
+                "/offer" -> runBlocking {  handleOffer(cleanedBody) }
                 else -> fixedLengthResponseWithCors(
                     Response.Status.NOT_FOUND, MIME_PLAINTEXT, "404 Not Found"
                 )
@@ -140,42 +134,33 @@ class WebServer(
         }
     }
 
-    private fun handleOffer(body: String): Response {
+    private suspend fun handleOffer(body: String): Response {
         val offer = JsonSerializer.decodeFromString<SdpPacket>(body)
         Timber.d(offer.toString())
 
-        runBlocking {
-            launch {
-                val packet = webRtcPresenter.createConnection(offer)
-
-            }
-        }
-
-
-
-        val answerSDP = SDP(
-            type = "answer",
-            sdp = offer.sdp().description
-        )
-
-//        val answer = Answer(
-//            answer = answerSDP,
-//            candidates = offer.candidates
-//        )
-
-        val responseJson = answerSDP.toJsonString()
+        val packet = webRtcPresenter.createConnection(offer)
+        val responseJson = packet.toJsonString()
 
         return fixedLengthResponseWithCors(
             Response.Status.OK, "application/json", responseJson
         )
+
     }
 
-    private fun fixedLengthResponseWithCors(status: Response.IStatus, mimeType: String, txt: String): Response {
+    private fun fixedLengthResponseWithCors(
+        status: Response.IStatus,
+        mimeType: String,
+        txt: String,
+    ): Response {
         return newFixedLengthResponse(status, mimeType, txt)
             .also(Response::addCors)
     }
 
-    private fun chunkedResponseWithCors(status: Response.IStatus, mimeType: String, data: InputStream): Response {
+    private fun chunkedResponseWithCors(
+        status: Response.IStatus,
+        mimeType: String,
+        data: InputStream,
+    ): Response {
         return newChunkedResponse(status, mimeType, data)
             .also(Response::addCors)
     }
@@ -183,6 +168,6 @@ class WebServer(
 
 fun Response.addCors() {
     this.addHeader("Access-Control-Allow-Methods", "DELETE, GET, POST, PUT");
-    this.addHeader("Access-Control-Allow-Origin",  "*");
+    this.addHeader("Access-Control-Allow-Origin", "*");
     this.addHeader("Access-Control-Allow-Headers", "X-Requested-With");
 }
