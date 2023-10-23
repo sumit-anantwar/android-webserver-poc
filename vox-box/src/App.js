@@ -99,9 +99,20 @@ function App() {
       console.log(JSON.stringify(data.data.answer))
       // pc.current.setLocalDescription(sdp) // set remote description here
       responseTextAreaRef.current.value = JSON.stringify(data)
-      pc.current.setRemoteDescription(new RTCSessionDescription(data.data.answer))
+
+      return handleAnswer(data)
     }).catch(e => console.log(e))
   }
+
+  const handleAnswer = async (data) => {
+    await pc.current.setRemoteDescription(data.data.sdp)
+
+    for (const candidate in data.data.icecandidates) {
+      console.log("Adding Candidates");
+      await pc.current.addIceCandidate(candidate);
+    }
+  }
+
   const createAnswer = () => {
     pc.current.createAnswer({
       offerToReceiveVideo: 1, // optional .. not needed to give

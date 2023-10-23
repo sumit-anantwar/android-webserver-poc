@@ -14,6 +14,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.webrtc.AudioTrack
+import org.webrtc.DataChannel
 import org.webrtc.IceCandidate
 import org.webrtc.MediaConstraints
 import org.webrtc.MediaStream
@@ -41,6 +42,7 @@ class WebRtcPeerConnection(
     private val candidates = mutableListOf<IceCandidate>()
 
     private val localPeer: PeerConnection
+    private var broadcastingDataChannel: DataChannel? = null
 
     private val answerPublisher = PublishSubject.create<SessionDescription>()
     private val candidatePublisher = PublishSubject.create<List<IceCandidate>>()
@@ -70,8 +72,17 @@ class WebRtcPeerConnection(
                         statusCallback.onDisconnected(this@WebRtcPeerConnection)
                     }
                 }
+
+                override fun onDataChannel(dataChannel: DataChannel) {
+                    super.onDataChannel(dataChannel)
+                    broadcastingDataChannel = dataChannel
+                }
             }
         ) ?: throw IllegalStateException("Can't create peerconnection")
+
+        // data channel for messaging
+        setupDataChannel(localPeer)
+        addStreamToLocalPeer(localPeer)
 
         val answerObservable = answerPublisher
             .map { it.toSdp() }
@@ -98,30 +109,42 @@ class WebRtcPeerConnection(
 
         runBlocking {
             launch {
-                localPeer?.setRemoteDescription(CustomSdpObserver(), offer.sdp())
+                localPeer.setRemoteDescription(CustomSdpObserver(), offer.sdp())
                 val candidates = offer.candidates()
                 Timber.d("Number of candidates: ${candidates.count()}")
                 for (candidate in candidates) {
-                    localPeer?.addIceCandidate(candidate, CustomAddIceObserver())
+                    localPeer.addIceCandidate(candidate, CustomAddIceObserver())
                     delay(1000)
                 }
             }
         }
 
-        addStreamToLocalPeer(localPeer)
         createAnswer(localPeer)
         Timber.d("Method complete")
     }
 
     // region === PRIVATE ===
 
+    private fun setupDataChannel(peerConnection: PeerConnection) {
+        val init = DataChannel.Init().apply { id = 0 }
+        val dataChannel = peerConnection.createDataChannel("dataChannel", init)
+        dataChannel.registerObserver(object : DataChannel.Observer {
+            override fun onBufferedAmountChange(l: Long) {}
+            override fun onStateChange() {
+            }
+
+            override fun onMessage(buffer: DataChannel.Buffer) {
+                Timber.d("Daya Channel Message Received")
+            }
+        })
+    }
+
     private fun createAnswer(peerConnection: PeerConnection) {
-        onIoThread {
+//        onIoThread {
             val sdpConstraints = MediaConstraints()
             sdpConstraints.mandatory.add(
                 MediaConstraints.KeyValuePair(
-                    "OfferToReceiveAudio",
-                    "true"
+                    "OfferToReceiveAudio", "true"
                 )
             )
             peerConnection.createAnswer(object : CustomSdpObserver() {
@@ -135,7 +158,7 @@ class WebRtcPeerConnection(
                     }, sdp)
                 }
             }, sdpConstraints)
-        }
+//        }
     }
 
     private fun addStreamToLocalPeer(peerConnection: PeerConnection) {

@@ -9,8 +9,11 @@ import android.util.Log
 import android.webkit.WebView
 import android.widget.TextView
 import com.example.web_server_poc.databinding.ActivityMainBinding
+import com.example.web_server_poc.utils.PermissionUtils
 import com.example.web_server_poc.webrtc.WebRtcPresenter
 import com.example.web_server_poc.webserver.WebServer
+import com.tbruyelle.rxpermissions3.RxPermissions
+import timber.log.Timber
 
 class MainActivity : AppCompatActivity() {
 
@@ -28,6 +31,15 @@ class MainActivity : AppCompatActivity() {
         textview_IP = binding.textviewIp
 
         val presenter = WebRtcPresenter(this)
+
+        val rxPermissions = RxPermissions(this)
+        PermissionUtils.requestPermission(
+            rxPermissions,
+            PermissionUtils.audioPermission,
+            PermissionUtils.phoneStatePermission
+        ) {
+            Timber.d("Permissions Granted")
+        }
 
         webServer = WebServer(this, presenter, port)
         try {

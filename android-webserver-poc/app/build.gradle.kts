@@ -54,6 +54,8 @@ dependencies {
     implementation("io.reactivex.rxjava3:rxkotlin:3.0.1")
     implementation("io.reactivex.rxjava3:rxandroid:3.0.2")
 
+    implementation("com.github.tbruyelle:rxpermissions:0.12")
+
     // WebRTC
 //    implementation("io.getstream:stream-webrtc-android:1.0.7")
 //    implementation("io.github.webrtc-sdk:android:114.5735.05")
