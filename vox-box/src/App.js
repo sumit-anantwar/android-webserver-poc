@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { sendOffer, testGoogle } from "./axios/requests";
+import adapter from 'webrtc-adapter';
 function App() {
   const localAudioRef = useRef()
   const remoteAudioRef = useRef()
@@ -96,7 +97,6 @@ function App() {
       return sendOffer(offerSdpAndCandidates)
     }).then(data => {
       console.log(JSON.stringify(data))
-      console.log(JSON.stringify(data.data.answer))
       // pc.current.setLocalDescription(sdp) // set remote description here
       responseTextAreaRef.current.value = JSON.stringify(data)
 
@@ -105,11 +105,12 @@ function App() {
   }
 
   const handleAnswer = async (data) => {
-    await pc.current.setRemoteDescription(data.data.sdp)
+    await pc.current.setRemoteDescription(new RTCSessionDescription(data.data.sdp))
 
     for (const candidate in data.data.icecandidates) {
       console.log("Adding Candidates");
-      await pc.current.addIceCandidate(candidate);
+      console.log(data.data.icecandidates[candidate])
+      await pc.current.addIceCandidate(new RTCIceCandidate(data.data.icecandidates[candidate]));
     }
   }
 
