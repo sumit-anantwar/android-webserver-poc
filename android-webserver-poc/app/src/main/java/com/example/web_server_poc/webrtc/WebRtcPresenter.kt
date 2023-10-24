@@ -12,10 +12,8 @@ class WebRtcPresenter(
     private val context: Context,
 ) {
 
-    private val localAudioTrack: AudioTrack
-    private val peerConnectionFactory = WebRtcUtils.createFactory(context).apply {
-        localAudioTrack = WebRtcUtils.createTrack(this)
-    }
+    private val peerConnectionFactory = WebRtcUtils.createFactory(context)
+    private val localAudioTrack = WebRtcUtils.createTrack(peerConnectionFactory)
 
     private val peerConnections = mutableListOf<WebRtcPeerConnection>()
 

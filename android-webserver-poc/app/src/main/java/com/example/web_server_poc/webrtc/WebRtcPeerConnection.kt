@@ -113,8 +113,8 @@ class WebRtcPeerConnection(
                 val candidates = offer.candidates()
                 Timber.d("Number of candidates: ${candidates.count()}")
                 for (candidate in candidates) {
-                    localPeer.addIceCandidate(candidate, CustomAddIceObserver())
-                    delay(1000)
+                    localPeer.addIceCandidate(candidate)
+                    delay(300)
                 }
             }
         }
@@ -140,7 +140,6 @@ class WebRtcPeerConnection(
     }
 
     private fun createAnswer(peerConnection: PeerConnection) {
-//        onIoThread {
             val sdpConstraints = MediaConstraints()
             sdpConstraints.mandatory.add(
                 MediaConstraints.KeyValuePair(
@@ -158,7 +157,6 @@ class WebRtcPeerConnection(
                     }, sdp)
                 }
             }, sdpConstraints)
-//        }
     }
 
     private fun addStreamToLocalPeer(peerConnection: PeerConnection) {

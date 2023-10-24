@@ -13,7 +13,11 @@ import com.example.web_server_poc.utils.PermissionUtils
 import com.example.web_server_poc.webrtc.WebRtcPresenter
 import com.example.web_server_poc.webserver.WebServer
 import com.tbruyelle.rxpermissions3.RxPermissions
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import timber.log.Timber
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 class MainActivity : AppCompatActivity() {
 
@@ -30,16 +34,23 @@ class MainActivity : AppCompatActivity() {
 
         textview_IP = binding.textviewIp
 
-        val presenter = WebRtcPresenter(this)
-
-        val rxPermissions = RxPermissions(this)
-        PermissionUtils.requestPermission(
-            rxPermissions,
-            PermissionUtils.audioPermission,
-            PermissionUtils.phoneStatePermission
-        ) {
-            Timber.d("Permissions Granted")
+        runBlocking {
+            launch {
+                suspendCoroutine { continuation ->
+                    val rxPermissions = RxPermissions(this@MainActivity)
+                    PermissionUtils.requestPermission(
+                        rxPermissions,
+                        PermissionUtils.audioPermission,
+                        PermissionUtils.phoneStatePermission
+                    ) {
+                        Timber.d("Permissions Granted")
+                        continuation.resume(Unit)
+                    }
+                }
+            }
         }
+
+        val presenter = WebRtcPresenter(this)
 
         webServer = WebServer(this, presenter, port)
         try {
