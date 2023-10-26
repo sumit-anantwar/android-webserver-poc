@@ -1,3 +1,8 @@
+html {
+    overflow: hidden;
+    overscroll-behavior: none;
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -5,9 +10,140 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: cornflowerblue;
 }
+
+html, body { height: 100%; }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+.Player {
+  text-align: center;
+  width: 100%;
+  height: 100%;
+}
+
+input {
+  max-width: 75%;
+  font-size: 150%;
+  text-align: center;
+  border-radius: 2ch;
+  text-transform: uppercase;
+}
+
+.InputField {
+  padding: 1em;
+  margin-bottom: 1em;
+  margin-top: 10px;
+}
+
+.btn-primary {
+  cursor: pointer;
+  padding: 0.5em;
+  padding-left: 1em;
+  padding-right: 1em;
+  font-weight: 700;
+  font-size: 110%;
+}
+
+.btn-secondary {
+  padding: 0.5em;
+  border-color: #ffffff;
+  color: #ffffff;
+  border-radius: 0.5em;
+  font-weight: 400;
+  font-size: 90%;
+  margin-bottom: 10%;
+  margin-left: 6px;
+  margin-right: 6px;
+  margin-top: 2%;
+  background-color: transparent;
+  vertical-align: middle;
+}
+
+.buttonOverflowEllipsis{
+  max-width: 80vw;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.translation-row {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 10px;
+  padding-left: 20px;
+  border: 1px solid gray;
+  border-radius: 5px;
+  margin-bottom: 2%;
+}
+
+.primary {
+  color: #ffffff;
+  padding-left: 10px;
+  background-color: #ffffff47;
+  height: 50px;
+}
+
+.primary img {
+  width: 50px !important;
+}
+
+.translation-row img {
+  width: 30px;
+  fill: white;
+}
+
+.translation-row span {
+  margin-right: auto;
+  margin-left: 20px;
+}
+
+.small-link {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  margin-bottom: 25px;
+  margin-top: 10px;
+  font-size: .7em;
+  vertical-align: middle;
+  justify-content: center;
+}
+
+.small-link img {
+  width: 30px;
+  fill: white;
+}
+
+.domainFlag {
+  position: absolute;
+  bottom: 1rem;
+  left: 1rem;
+  background-color: red;
+  border-radius: 50%;
+  width: 8px;
+  height: 8px;
+  z-index: 10000;
+}
+
+.infoBtnWrapper {
+  position: absolute;
+  top: calc(100% - 30px);
+  left: calc(100% - 30px);
+}
+
+.infoBtn {
+padding: 0;
+  background-color: transparent;
+  border: none;
+}
+.infoBtnImg{
+  width: 25px;
+  height: 25px;
+  padding: 0;
+
 }

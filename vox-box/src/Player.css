@@ -1,0 +1,440 @@
+video {
+    width: 100%;
+    max-width: 640px;
+  }
+
+.App-logo {
+  height: 19vh;
+  pointer-events: none;
+  margin-bottom: 3em;
+  margin-top: 5em;
+}
+
+.App-logo-sm {
+  height: 15vh;
+  pointer-events: none;
+  margin-bottom: 4em;
+  margin-top: 3em;
+}
+  .App-logo-xsm {
+    height: 8vh;
+    margin-bottom: 2em;
+    margin-top: 2em;
+  }
+.App-header {
+  background-color: #003c50;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+.App-header-translator-list {
+  background-color: #003c50;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+  overflow: auto;
+}
+
+.Player-translator-list {
+  position: fixed;
+  height: 100%;
+  width: 100vw;
+  max-height: 100%;
+  overflow: auto;
+  background-color: #003c50;
+}
+
+.Translator-back {
+  margin-bottom: 10px;
+}
+
+.Translator-spacer {
+  flex: 1;
+}
+
+.presenterMessages {
+  display: flex;
+  justify-content: center;
+  gap: 1em;
+}
+
+.active-track{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.active-track-playing {
+  display: flex;
+  align-items: center;
+  font-size: .7em;
+}
+
+.badgePadding{
+  margin-left: -0.6em;
+  margin-top: -0.3em;
+  box-sizing: border-box;
+}
+
+.logo-presenter-block {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.voxModalWrappper{
+  position: absolute;
+  width: 100vw;
+  height: 100%;
+  z-index: 100;
+}
+
+.flagImageWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.voxModalBackground{
+  width: 100vw;
+  height: 100%;
+  background-color: #003c50;
+  position: fixed;
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  flex-direction: column;
+}
+
+/** new message  **/
+.newMessage {
+  position: absolute;
+  bottom: 11vh;
+  right: 8vw;
+  background-color: #003c50;
+  border-radius: 18px;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  display: flex;
+  gap: 1rem;
+}
+
+
+.messageName {
+  margin: 10px;
+  margin-left: 10px;
+  margin-right: 10px;
+  margin-bottom: 10px;
+}
+.messageText {
+  margin-left: 10px;
+  margin-right: 10px;
+  margin-bottom: 10px;
+}
+.createMessage label {
+  text-align: left;
+  display: block;
+  color: #999;
+  font-size: small;
+  padding-left: .7rem;
+}
+
+.createMessage input, .createMessage textarea {
+  width: 100%;
+  max-width: 100%;
+  border-radius: 12px;
+  padding: 6px 10px;
+  border: 1px solid #555;
+  box-sizing: border-box;
+  display: block;
+  text-align: left;
+  
+}
+
+.createMessage  input[type=text]:focus, textarea:focus {
+  border: 2px solid #555;
+  outline: none;
+  -webkit-box-shadow: none;
+  box-shadow: none;
+  text-transform: none;
+}
+.sendMessageOuter {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+}
+.sendMessage {
+  position: absolute;
+  bottom: 5vh;
+  background-color: #003c50;
+  border: none;
+  border-radius: 18px;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  color: white;
+}
+
+.voxModalContainer{
+  width: 95%;
+  height: 89%;
+  border-radius: 12px;
+  background-color: white;
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  padding-top: 1.9rem;
+  overflow: auto;
+}
+.voxModalTitle{
+  background-color: #003c50;
+}
+
+.modaltitle{
+  width: 4rem;
+  height: 4rem;
+}
+
+.closeVoxModal{
+  background-color: transparent;
+  position: absolute;
+  border: none;
+  top: 53px;
+  right: 3%;
+  z-index: 999;
+}
+
+.closeBtn{
+  width: 35px;
+  height: 35px;
+
+}
+
+.voxModalMessagesContainer {
+  width: 95%;
+  height: 89%;
+  border-radius: 12px;
+  background-color: white;
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+}
+
+.voxModalMessagesBody{
+  display: flex;
+  flex-wrap: wrap;
+  color: black;
+  justify-content: flex-start;
+  background-color: transparent;
+  flex-direction: column;
+}
+
+.voxModalMessagesBody > .messageTitle {
+  color: white;
+  background-color: #1B7299;
+;
+  padding: 0.2rem;
+} 
+
+.voxMessage {
+  font-size: small;
+  text-align: left;
+  padding: 0.7rem;
+  background-color: #DEEDFC;
+  border-radius: 6px;
+  margin-top: 0.5rem;
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+}
+
+.voxTimestamp {
+  font-size: x-small;
+  text-align: right;
+  padding-right: 1rem;
+}
+
+.voxModalBody{
+  display: flex;
+  flex-wrap: wrap;
+  color: black;
+  justify-content: flex-start;
+  background-color: transparent;
+}
+.voxModalBody > div {
+  margin-bottom: 5%;
+  flex: 0 50%;
+}
+
+.voxModalFileBody{
+  display: flex;
+  justify-content: flex-start;
+  background-color: transparent;
+  height: 100%;
+}
+
+.player-main-body{
+  flex: 1;
+  margin-top: 30px;
+}
+
+.Player{
+    position: fixed;
+    height: 100%;
+    width: 100vw;
+    max-height: 100%;
+    overflow: hidden;
+    overscroll-behavior: none;
+  }
+
+.infoModalWrapper{
+  position: absolute;
+  width: 100vw;
+  height: 100%;
+  z-index: 100;
+}
+
+.infoModalBackground{
+  width: 100vw;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  position: fixed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+.infoModalContainer{
+  width: 250px;
+  max-height: 500px;
+  /* margin-bottom: 28px; */
+  border-radius: 7px;
+  background-color: white;
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+.info-App-logo {
+  height: 70px;
+  pointer-events: none;
+  margin-bottom: 15px;
+  margin-top: -15px;
+}
+.close-btn-info {
+  position: relative;
+  top: -19px;
+  right: -89px;
+}
+
+@media (max-width: 575px){
+
+  .player-footer {
+    margin-bottom: 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+  }
+  .voxModalBackground{
+    height: 92% !important;
+  }
+}
+
+@media (min-width: 700px) and (max-width: 809px){
+  .App-logo {
+    height: 40vmin;
+    margin-top: 2em;
+  }
+
+  .App-logo-sm {
+    height: 15vmin;
+    margin-top: 3em;
+  }
+
+  .newMessage {
+    bottom: 7vh;
+  }
+}
+
+@media (min-width: 810px){
+  .voxModalContainer{
+    width: 800px;
+  }
+  .voxModalMessagesContainer{
+    width: 800px;
+  }
+  .newMessage {
+    bottom: 80px;
+    right: 26vw;
+  }
+  .closeVoxModal{
+    top: 49px;
+    left: 760px;
+    z-index: 999;
+  }
+
+  .App-logo {
+    height: 40vmin;
+    margin-top: 1em;
+  }
+
+  .App-logo-sm {
+    height: 20vmin;
+    margin-top: 1em;
+  }
+}
+
+.joinstream {
+  margin-bottom: 15px;
+}
+
+.version {
+  color: black;
+  font-size: calc(5px + 2vmin);
+  position: absolute;
+  background-color: transparent;
+  top: 97%;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  margin-left: auto;
+  text-align: end;
+}
+
+@media (max-height: 620px) {
+  .App-logo {
+    height: 13vh;
+    margin-bottom: 2em;
+    margin-top: 2em;
+  }
+
+  .App-logo-sm {
+    height: 8vh;
+    margin-bottom: 2em;
+    margin-top: 2em;
+  }
+  
+  .App-logo-xsm {
+    height: 7vh;
+    margin-bottom: 1em;
+    margin-top: 1em;
+  }
+}

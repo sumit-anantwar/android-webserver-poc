@@ -1,13 +1,38 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { sendOffer, testGoogle } from "./axios/requests";
 import adapter from 'webrtc-adapter';
-function App() {
+import "./Player.css"
+import logo from "./images/vox_logo.svg";
+import { RotatingLines } from "react-loader-spinner";
+import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
+const PlayStream = (props) => {
+  const history = useHistory()
   const localAudioRef = useRef()
   const remoteAudioRef = useRef()
   const iceCandidatesRef = useRef(new Array())
   const pc = useRef(new RTCPeerConnection(null))
   const textAreaRef = useRef()
   const responseTextAreaRef = useRef()
+
+  const [isLoading, setIsLoading] = useState(false)
+  const [isActiveStream, setIsActiveStream] = useState(false)
+  const [ready, setReady] = useState(false) 
+  
+  const spinner = () => {
+    console.log("Loading Spinner");
+    return (
+      <header className="App-header">
+        <RotatingLines
+          strokeColor="grey"
+          strokeWidth="5"
+          animationDuration="0.75"
+          width="96"
+          visible={true}
+        />
+      </header>
+    );
+  };
+
 
   useEffect(() => {
 
@@ -58,15 +83,27 @@ function App() {
     _pc.ontrack = (e) => {
       // we got remote stream
       remoteAudioRef.current.srcObject = e.streams[0]
+      setIsLoading(false)
+      setIsActiveStream(true)
     }
 
     pc.current = _pc
 
+    setReady(true)
     return () => {
       // cleanup
     }
   }, [])
 
+  useEffect(()=>{
+    if (ready === true) {
+      rTChandshake()
+    }
+  },[ready])
+
+  const stopStream = () => {
+    history.push("/")
+  }
   const createOffer = () => {
     pc.current.createOffer({
       offerToReceiveVideo: 0, // optional .. not needed to give
@@ -74,18 +111,20 @@ function App() {
     }).then(sdp => {
       console.log(JSON.stringify(sdp))
       pc.current.setLocalDescription(sdp)
-      textAreaRef.current.value = JSON.stringify(sdp)
+      // textAreaRef.current.value = JSON.stringify(sdp)
     }).catch(e => console.log(e))
   }
 
+
   const rTChandshake = () => {
+    setIsLoading(true)
     pc.current.createOffer({
       offerToReceiveVideo: 0, // optional .. not needed to give
       offerToReceiveAudio: 1, // optional .. not needed to give
     }).then(sdp => {
       console.log(JSON.stringify(sdp))
       pc.current.setLocalDescription(sdp)
-      textAreaRef.current.value = JSON.stringify(sdp)
+      // textAreaRef.current.value = JSON.stringify(sdp)
       return new Promise(resolve => setTimeout(() => resolve(sdp), 3000))
     }).then(sdpData => {
       const offerSdpAndCandidates = {
@@ -98,7 +137,7 @@ function App() {
     }).then(data => {
       console.log(JSON.stringify(data))
       // pc.current.setLocalDescription(sdp) // set remote description here
-      responseTextAreaRef.current.value = JSON.stringify(data)
+      // responseTextAreaRef.current.value = JSON.stringify(data)
 
       return handleAnswer(data)
     }).catch(e => console.log(e))
@@ -136,32 +175,66 @@ function App() {
     pc.current.addIceCandidate(new RTCIceCandidate(candidate))
   }
 
+  // return (
+  //   <div style={{ margin: 10 }}>
+  //     <video style={{
+  //       width: 240, height: 240,
+  //       margin: 5, backgroundColor: "black"
+  //     }}
+  //       ref={localAudioRef} autoPlay></video>
+  //     <video style={{
+  //       width: 240, height: 240,
+  //       margin: 5, backgroundColor: "black"
+  //     }}
+  //       ref={remoteAudioRef} autoPlay></video>
+  //     <br />
+  //     {/* <button onClick={createOffer}>Create Offer</button> */}
+  //     <button onClick={rTChandshake}>Create Offer</button>
+  //     <button onClick={createAnswer}>Create Answer</button>
+  //     <br />
+  //     <textarea ref={textAreaRef}></textarea>
+  //     <br />
+  //     <button onClick={setRemoteDescription}>Set Remote Description</button>
+  //     <button onClick={addCandidate}>Add Candidates</button>
+  //     <br />
+  //     <textarea ref={responseTextAreaRef}></textarea>
+  //     <br />
+  //   </div>
+  // );
   return (
-    <div style={{ margin: 10 }}>
-      <video style={{
-        width: 240, height: 240,
-        margin: 5, backgroundColor: "black"
-      }}
-        ref={localAudioRef} autoPlay></video>
-      <video style={{
-        width: 240, height: 240,
-        margin: 5, backgroundColor: "black"
-      }}
-        ref={remoteAudioRef} autoPlay></video>
-      <br />
-      {/* <button onClick={createOffer}>Create Offer</button> */}
-      <button onClick={rTChandshake}>Create Offer</button>
-      <button onClick={createAnswer}>Create Answer</button>
-      <br />
-      <textarea ref={textAreaRef}></textarea>
-      <br />
-      <button onClick={setRemoteDescription}>Set Remote Description</button>
-      <button onClick={addCandidate}>Add Candidates</button>
-      <br />
-      <textarea ref={responseTextAreaRef}></textarea>
-      <br />
+    <>
+    <div className="Player">
+      <header className="App-header">
+        <div className="logo-presenter-block">
+          <img src={logo} alt="logo" className="App-logo" />
+        </div>
+         <div className="player-main-body">
+          {isLoading === true ? spinner() : <></>}
+          <video style={{
+            width: 1, height: 1,
+            backgroundColor: "transparent"
+          }}
+            ref={localAudioRef} autoPlay></video>
+          <video style={{
+            width: 1, height: 1,
+            backgroundColor: "transparent"
+          }}
+            ref={remoteAudioRef} autoPlay></video>
+         </div>
+         <div className="player-footer">
+          <div className="joinstream">
+            {
+              <button onClick={stopStream} className="btn-primary" id="start_play_button">STOP STREAM</button>
+            }
+
+              
+          </div>
+         </div>
+      </header>
     </div>
-  );
+    </>
+  )
 }
 
-export default App;
+export default PlayStream;
+
