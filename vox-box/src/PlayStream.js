@@ -16,8 +16,8 @@ const PlayStream = (props) => {
 
   const [isLoading, setIsLoading] = useState(false)
   const [isActiveStream, setIsActiveStream] = useState(false)
-  const [ready, setReady] = useState(false) 
-  
+  const [ready, setReady] = useState(false)
+
   const spinner = () => {
     console.log("Loading Spinner");
     return (
@@ -42,32 +42,21 @@ const PlayStream = (props) => {
       video: false,
     }
 
+    /* getUserMedia end */
+
+    const _pc = new RTCPeerConnection(null)
 
     // navigator.mediaDevices.getUserMedia(constraints)
     //   .then(stream => {
     //     // display audio/video
     //     localAudioRef.current.srcObject = stream
+    //     stream.getTracks().forEach(track => {
+    //       _pc.addTrack(track, stream)
+    //     })
     //   })
     //   .catch(e => {
     //     console.log("error occured:", e)
     //   })
-
-
-    /* getUserMedia end */
-
-    const _pc = new RTCPeerConnection(null)
-
-    navigator.mediaDevices.getUserMedia(constraints)
-      .then(stream => {
-        // display audio/video
-        localAudioRef.current.srcObject = stream
-        stream.getTracks().forEach(track => {
-          _pc.addTrack(track, stream)
-        })
-      })
-      .catch(e => {
-        console.log("error occured:", e)
-      })
 
     _pc.onicecandidate = (e) => {
       if (e.candidate) {
@@ -95,11 +84,11 @@ const PlayStream = (props) => {
     }
   }, [])
 
-  useEffect(()=>{
+  useEffect(() => {
     if (ready === true) {
       rTChandshake()
     }
-  },[ready])
+  }, [ready])
 
   const stopStream = () => {
     history.push("/")
@@ -203,35 +192,35 @@ const PlayStream = (props) => {
   // );
   return (
     <>
-    <div className="Player">
-      <header className="App-header">
-        <div className="logo-presenter-block">
-          <img src={logo} alt="logo" className="App-logo" />
-        </div>
-         <div className="player-main-body">
-          {isLoading === true ? spinner() : <></>}
-          <video style={{
-            width: 1, height: 1,
-            backgroundColor: "transparent"
-          }}
-            ref={localAudioRef} autoPlay></video>
-          <video style={{
-            width: 1, height: 1,
-            backgroundColor: "transparent"
-          }}
-            ref={remoteAudioRef} autoPlay></video>
-         </div>
-         <div className="player-footer">
-          <div className="joinstream">
-            {
-              <button onClick={stopStream} className="btn-primary" id="start_play_button">STOP STREAM</button>
-            }
-
-              
+      <div className="Player">
+        <header className="App-header">
+          <div className="logo-presenter-block">
+            <img src={logo} alt="logo" className="App-logo" />
           </div>
-         </div>
-      </header>
-    </div>
+          <div className="player-main-body">
+            {isLoading === true ? spinner() : <></>}
+            <video style={{
+              width: 1, height: 1,
+              backgroundColor: "transparent"
+            }}
+              ref={localAudioRef} autoPlay></video>
+            <video style={{
+              width: 1, height: 1,
+              backgroundColor: "transparent"
+            }}
+              ref={remoteAudioRef} autoPlay></video>
+          </div>
+          <div className="player-footer">
+            <div className="joinstream">
+              {
+                <button onClick={stopStream} className="btn-primary" id="start_play_button">STOP STREAM</button>
+              }
+
+
+            </div>
+          </div>
+        </header>
+      </div>
     </>
   )
 }

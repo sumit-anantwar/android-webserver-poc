@@ -5,7 +5,7 @@ import "./Player.css"
 import logo from "./images/vox_logo.svg";
 import { RotatingLines } from "react-loader-spinner";
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
-const JoinStream = (props)=> {
+const JoinStream = (props) => {
   const history = useHistory()
   useEffect(() => {
 
@@ -17,16 +17,16 @@ const JoinStream = (props)=> {
 
 
     // ask user to allow audio access
-    navigator.mediaDevices.getUserMedia(constraints)
-      .then(stream => {
-      })
-      .catch(e => {
-        console.log("error occured:", e)
-      })
+    // navigator.mediaDevices.getUserMedia(constraints)
+    //   .then(stream => {
+    //   })
+    //   .catch(e => {
+    //     console.log("error occured:", e)
+    //   })
 
-    return () => {
-      // cleanup
-    }
+    // return () => {
+    //   // cleanup
+    // }
   }, [])
 
   const playStream = () => {
@@ -34,22 +34,22 @@ const JoinStream = (props)=> {
   }
   return (
     <>
-    <div className="Player">
-      <header className="App-header">
-        <div className="logo-presenter-block">
-          <img src={logo} alt="logo" className="App-logo" />
-        </div>
-         <div className="player-main-body">
-         </div>
-         <div className="player-footer">
-          <div className="joinstream">
-            {
-              <button onClick={playStream} className="btn-primary" id="start_play_button">JOIN STREAM</button>
-            }
+      <div className="Player">
+        <header className="App-header">
+          <div className="logo-presenter-block">
+            <img src={logo} alt="logo" className="App-logo" />
           </div>
-         </div>
-      </header>
-    </div>
+          <div className="player-main-body">
+          </div>
+          <div className="player-footer">
+            <div className="joinstream">
+              {
+                <button onClick={playStream} className="btn-primary" id="start_play_button">JOIN STREAM</button>
+              }
+            </div>
+          </div>
+        </header>
+      </div>
     </>
   )
 }
