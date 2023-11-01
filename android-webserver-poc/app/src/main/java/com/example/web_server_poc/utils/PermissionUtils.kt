@@ -1,28 +1,32 @@
 package com.example.web_server_poc.utils
 
 import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.FragmentActivity
 import com.tbruyelle.rxpermissions3.RxPermissions
+import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.Disposable
 
 object PermissionUtils {
 
-    val cameraPermission = Manifest.permission.CAMERA
-    val audioPermission = Manifest.permission.RECORD_AUDIO
-    val phoneStatePermission = Manifest.permission.READ_PHONE_STATE
+    private val requiredPermissions = arrayOf(
+        Manifest.permission.RECORD_AUDIO,
+    )
 
-    fun requestPermission(rxPermission: RxPermissions, vararg permission: String, block: () -> Unit): Disposable {
-        return rxPermission.requestEach(*permission)
-            .subscribe { perm ->  // will emit 2 Permission objects
-                if (perm.granted) {
-                    // permissions granted
-                    block()
-                } else if (perm.shouldShowRequestPermissionRationale) {
-                    // Denied
-                } else {
-                    // Denied permission with ask never again,  need to go to the settings
-                    // ignored
-                }
+    fun hasPermissionsGranted(context: Context): Boolean {
+        for (permission in requiredPermissions) {
+            if (ContextCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
+                return false
             }
+        }
+
+        return true
+    }
+    fun requestPermission(activity: FragmentActivity): Single<List<Boolean>> {
+        return RxPermissions(activity).request(*requiredPermissions)
+            .toSortedList()
     }
 
 //    fun checkPermissionsAndProceed(activity: FragmentActivity, permision: String, action: () -> Unit) {

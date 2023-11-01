@@ -71,6 +71,9 @@ class WebRtcPeerConnection(
                     if (iceConnectionState == PeerConnection.IceConnectionState.FAILED) {
                         statusCallback.onDisconnected(this@WebRtcPeerConnection)
                     }
+                    if (iceConnectionState == PeerConnection.IceConnectionState.DISCONNECTED) {
+                        statusCallback.onDisconnected(this@WebRtcPeerConnection)
+                    }
                 }
 
                 override fun onDataChannel(dataChannel: DataChannel) {

@@ -1,14 +1,14 @@
 {
   "files": {
     "main.css": "/static/css/main.dfe6747e.css",
-    "main.js": "/static/js/main.a8b9fe3a.js",
+    "main.js": "/static/js/main.f23b2d9e.js",
     "static/media/vox_logo.svg": "/static/media/vox_logo.676ce51592d26e2fe9739b74791b627a.svg",
     "index.html": "/index.html",
     "main.dfe6747e.css.map": "/static/css/main.dfe6747e.css.map",
-    "main.a8b9fe3a.js.map": "/static/js/main.a8b9fe3a.js.map"
+    "main.f23b2d9e.js.map": "/static/js/main.f23b2d9e.js.map"
   },
   "entrypoints": [
     "static/css/main.dfe6747e.css",
-    "static/js/main.a8b9fe3a.js"
+    "static/js/main.f23b2d9e.js"
   ]
 }

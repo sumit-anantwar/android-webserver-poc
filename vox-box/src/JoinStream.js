@@ -7,27 +7,6 @@ import { RotatingLines } from "react-loader-spinner";
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 const JoinStream = (props) => {
   const history = useHistory()
-  useEffect(() => {
-
-    /* getUserMedia start */
-    const constraints = {
-      audio: false,
-      video: false,
-    }
-
-
-    // ask user to allow audio access
-    // navigator.mediaDevices.getUserMedia(constraints)
-    //   .then(stream => {
-    //   })
-    //   .catch(e => {
-    //     console.log("error occured:", e)
-    //   })
-
-    // return () => {
-    //   // cleanup
-    // }
-  }, [])
 
   const playStream = () => {
     history.push("/stream")

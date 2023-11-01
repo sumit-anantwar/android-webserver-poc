@@ -13,6 +13,9 @@ import com.example.web_server_poc.utils.PermissionUtils
 import com.example.web_server_poc.webrtc.WebRtcPresenter
 import com.example.web_server_poc.webserver.WebServer
 import com.tbruyelle.rxpermissions3.RxPermissions
+import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.kotlin.addTo
+import io.reactivex.rxjava3.kotlin.subscribeBy
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import timber.log.Timber
@@ -20,6 +23,8 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 class MainActivity : AppCompatActivity() {
+
+    private val disposables = CompositeDisposable()
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var textview_IP: TextView
@@ -33,23 +38,21 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         textview_IP = binding.textviewIp
+    }
 
-        runBlocking {
-            launch {
-                suspendCoroutine { continuation ->
-                    val rxPermissions = RxPermissions(this@MainActivity)
-                    PermissionUtils.requestPermission(
-                        rxPermissions,
-                        PermissionUtils.audioPermission,
-                        PermissionUtils.phoneStatePermission
-                    ) {
-                        Timber.d("Permissions Granted")
-                        continuation.resume(Unit)
-                    }
-                }
-            }
-        }
+    override fun onResume() {
+        super.onResume()
 
+        checkPermissions()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        webServer?.stop()
+        disposables.dispose()
+    }
+
+    private fun launchServer() {
         val presenter = WebRtcPresenter(this)
 
         webServer = WebServer(this, presenter, port)
@@ -63,12 +66,21 @@ class MainActivity : AppCompatActivity() {
         textview_IP.text = String.format("%s:%d", ipAddress, port)
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        webServer?.stop()
+    private fun checkPermissions() {
+        if (PermissionUtils.hasPermissionsGranted(this)) {
+            launchServer()
+        } else {
+            PermissionUtils.requestPermission(this)
+                .subscribeBy(
+                    onError = Timber::e,
+                    onSuccess = {
+                        Timber.d("Permissions Granted: $it")
+                    }
+                ).addTo(disposables)
+        }
     }
 
-    fun getLocalIpAddress(context: Context): String? {
+    private fun getLocalIpAddress(context: Context): String? {
         val wifiManager = context.getSystemService(Context.WIFI_SERVICE) as WifiManager
         val wifiInfo: WifiInfo = wifiManager.connectionInfo
         val ipAddress = wifiInfo.ipAddress

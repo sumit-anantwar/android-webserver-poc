@@ -36,28 +36,7 @@ const PlayStream = (props) => {
 
   useEffect(() => {
 
-    /* getUserMedia start */
-    const constraints = {
-      audio: false,
-      video: false,
-    }
-
-    /* getUserMedia end */
-
     const _pc = new RTCPeerConnection(null)
-
-    // navigator.mediaDevices.getUserMedia(constraints)
-    //   .then(stream => {
-    //     // display audio/video
-    //     localAudioRef.current.srcObject = stream
-    //     stream.getTracks().forEach(track => {
-    //       _pc.addTrack(track, stream)
-    //     })
-    //   })
-    //   .catch(e => {
-    //     console.log("error occured:", e)
-    //   })
-
     _pc.onicecandidate = (e) => {
       if (e.candidate) {
         console.log("icecandidates here:" + JSON.stringify(e.candidate))
@@ -199,24 +178,13 @@ const PlayStream = (props) => {
           </div>
           <div className="player-main-body">
             {isLoading === true ? spinner() : <></>}
-            <video style={{
-              width: 1, height: 1,
-              backgroundColor: "transparent"
-            }}
-              ref={localAudioRef} autoPlay></video>
-            <video style={{
-              width: 1, height: 1,
-              backgroundColor: "transparent"
-            }}
-              ref={remoteAudioRef} autoPlay></video>
+            <video hidden autoPlay controls playsInline ref={remoteAudioRef}></video>
           </div>
           <div className="player-footer">
             <div className="joinstream">
               {
                 <button onClick={stopStream} className="btn-primary" id="start_play_button">STOP STREAM</button>
               }
-
-
             </div>
           </div>
         </header>
