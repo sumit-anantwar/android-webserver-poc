@@ -177,12 +177,12 @@ const PlayStream = (props) => {
             <img src={logo} alt="logo" className="App-logo" />
           </div>
           <div className="player-main-body">
-            {isLoading === true ? spinner() : <></>}
+            {isLoading === true ? spinner() : <div>Connected</div>}
             <video hidden autoPlay controls playsInline ref={remoteAudioRef}></video>
           </div>
           <div className="player-footer">
             <div className="joinstream">
-              {
+              {isLoading === true ?<button disabled="true" className="btn-primary" id="start_play_button">JOIN STREAM</button>:
                 <button onClick={stopStream} className="btn-primary" id="start_play_button">STOP STREAM</button>
               }
             </div>
