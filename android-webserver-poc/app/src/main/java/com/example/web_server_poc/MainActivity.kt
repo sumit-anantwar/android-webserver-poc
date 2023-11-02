@@ -7,11 +7,17 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.webkit.WebView
+import android.widget.ImageView
 import android.widget.TextView
 import com.example.web_server_poc.databinding.ActivityMainBinding
 import com.example.web_server_poc.utils.PermissionUtils
+import com.example.web_server_poc.utils.onIoThread
+import com.example.web_server_poc.utils.onMainThread
 import com.example.web_server_poc.webrtc.WebRtcPresenter
 import com.example.web_server_poc.webserver.WebServer
+import com.google.zxing.BarcodeFormat
+import com.google.zxing.MultiFormatWriter
+import com.journeyapps.barcodescanner.BarcodeEncoder
 import com.tbruyelle.rxpermissions3.RxPermissions
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.addTo
@@ -27,7 +33,10 @@ class MainActivity : AppCompatActivity() {
     private val disposables = CompositeDisposable()
 
     private lateinit var binding: ActivityMainBinding
+
     private lateinit var textview_IP: TextView
+    private lateinit var imageview_QRCode: ImageView
+    private lateinit var textview_ListenerCount: TextView
 
     private var webServer: WebServer? = null
 
@@ -38,6 +47,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         textview_IP = binding.textviewIp
+        textview_ListenerCount = binding.textviewListenerCount
+        imageview_QRCode = binding.imageviewQrcode
     }
 
     override fun onResume() {
@@ -52,8 +63,16 @@ class MainActivity : AppCompatActivity() {
         disposables.dispose()
     }
 
+    private val webRtcPresenterCallback =  object : WebRtcPresenter.Callback {
+        override fun onListenerCountChanged(count: Int) {
+            onMainThread(this@MainActivity) {
+                textview_ListenerCount.setText(count.toString())
+            }
+        }
+    }
+
     private fun launchServer() {
-        val presenter = WebRtcPresenter(this)
+        val presenter = WebRtcPresenter(this, webRtcPresenterCallback)
 
         webServer = WebServer(this, presenter, port)
         try {
@@ -64,6 +83,17 @@ class MainActivity : AppCompatActivity() {
 
         val ipAddress = getLocalIpAddress(this)
         textview_IP.text = String.format("%s:%d", ipAddress, port)
+        val streamUrl = "http://$ipAddress:$port"
+        try {
+            val writer = MultiFormatWriter()
+            val bitMatrix = writer.encode(streamUrl, BarcodeFormat.QR_CODE, 800, 800)
+            val barcodeEncoder = BarcodeEncoder()
+            val bitmap = barcodeEncoder.createBitmap(bitMatrix)
+
+            imageview_QRCode.setImageBitmap(bitmap)
+        } catch (e: Exception) {
+            Timber.e(e)
+        }
     }
 
     private fun checkPermissions() {

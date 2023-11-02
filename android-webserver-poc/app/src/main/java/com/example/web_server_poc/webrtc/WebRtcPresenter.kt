@@ -10,7 +10,12 @@ import kotlin.coroutines.suspendCoroutine
 
 class WebRtcPresenter(
     private val context: Context,
+    private val callback: Callback
 ) {
+
+    interface Callback {
+        fun onListenerCountChanged(count: Int)
+    }
 
     private val peerConnectionFactory = WebRtcUtils.createFactory(context)
     private val localAudioTrack = WebRtcUtils.createTrack(peerConnectionFactory)
@@ -20,6 +25,8 @@ class WebRtcPresenter(
     private val connectionStatusCallback = object : WebRtcPeerConnection.StatusCallback {
         override fun onDisconnected(connection: WebRtcPeerConnection) {
             Timber.d("Peer Disconnected")
+            peerConnections.remove(connection)
+            callback.onListenerCountChanged(peerConnections.count())
         }
     }
 
@@ -34,6 +41,7 @@ class WebRtcPresenter(
             )
 
             peerConnections.add(peerConnection)
+            callback.onListenerCountChanged(peerConnections.count())
         }
 
         return answer

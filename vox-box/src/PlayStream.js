@@ -70,6 +70,7 @@ const PlayStream = (props) => {
   }, [ready])
 
   const stopStream = () => {
+    pc.current.close()
     history.push("/")
   }
   const createOffer = () => {

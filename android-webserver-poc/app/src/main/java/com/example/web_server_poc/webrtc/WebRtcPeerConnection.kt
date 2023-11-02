@@ -68,10 +68,9 @@ class WebRtcPeerConnection(
 
                 override fun onIceConnectionChange(iceConnectionState: PeerConnection.IceConnectionState) {
                     super.onIceConnectionChange(iceConnectionState)
-                    if (iceConnectionState == PeerConnection.IceConnectionState.FAILED) {
-                        statusCallback.onDisconnected(this@WebRtcPeerConnection)
-                    }
-                    if (iceConnectionState == PeerConnection.IceConnectionState.DISCONNECTED) {
+                    if ((iceConnectionState == PeerConnection.IceConnectionState.FAILED) ||
+                        (iceConnectionState == PeerConnection.IceConnectionState.DISCONNECTED)) {
+
                         statusCallback.onDisconnected(this@WebRtcPeerConnection)
                     }
                 }
@@ -143,23 +142,23 @@ class WebRtcPeerConnection(
     }
 
     private fun createAnswer(peerConnection: PeerConnection) {
-            val sdpConstraints = MediaConstraints()
-            sdpConstraints.mandatory.add(
-                MediaConstraints.KeyValuePair(
-                    "OfferToReceiveAudio", "true"
-                )
+        val sdpConstraints = MediaConstraints()
+        sdpConstraints.mandatory.add(
+            MediaConstraints.KeyValuePair(
+                "OfferToReceiveAudio", "true"
             )
-            peerConnection.createAnswer(object : CustomSdpObserver() {
-                override fun onCreateSuccess(sdp: SessionDescription) {
-                    super.onCreateSuccess(sdp)
-                    peerConnection.setLocalDescription(object : CustomSdpObserver() {
-                        override fun onSetSuccess() {
-                            super.onSetSuccess()
-                            answerPublisher.onNext(sdp)
-                        }
-                    }, sdp)
-                }
-            }, sdpConstraints)
+        )
+        peerConnection.createAnswer(object : CustomSdpObserver() {
+            override fun onCreateSuccess(sdp: SessionDescription) {
+                super.onCreateSuccess(sdp)
+                peerConnection.setLocalDescription(object : CustomSdpObserver() {
+                    override fun onSetSuccess() {
+                        super.onSetSuccess()
+                        answerPublisher.onNext(sdp)
+                    }
+                }, sdp)
+            }
+        }, sdpConstraints)
     }
 
     private fun addStreamToLocalPeer(peerConnection: PeerConnection) {

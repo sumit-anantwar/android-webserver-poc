@@ -62,6 +62,10 @@ dependencies {
     implementation("org.webrtc:google-webrtc:1.0.32006")
 //    implementation("com.dafruits:webrtc:117.0.0")
 
+    implementation("androidmads.library.qrgenearator:QRGenearator:1.0.4")
+    implementation("com.google.zxing:core:3.3.3")
+    implementation("com.journeyapps:zxing-android-embedded:3.6.0@aar")
+
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
 
     testImplementation("junit:junit:4.13.2")
