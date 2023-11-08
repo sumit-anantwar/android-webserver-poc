@@ -11,6 +11,7 @@ const PlayStream = (props) => {
   const remoteAudioRef = useRef()
   const iceCandidatesRef = useRef(new Array())
   const pc = useRef(new RTCPeerConnection(null))
+  const dc = useRef()
   const textAreaRef = useRef()
   const responseTextAreaRef = useRef()
 
@@ -54,6 +55,11 @@ const PlayStream = (props) => {
       setIsLoading(false)
       setIsActiveStream(true)
     }
+    _pc.ondatachannel = (e) => {
+      dc.current = e.channel;
+      console.log("Datachannel event: " + e);
+    }
+    _pc.createDataChannel("dataChannel");
 
     pc.current = _pc
 
@@ -183,7 +189,7 @@ const PlayStream = (props) => {
           </div>
           <div className="player-footer">
             <div className="joinstream">
-              {isLoading === true ?<button disabled="true" className="btn-primary" id="start_play_button">JOIN STREAM</button>:
+              {isLoading === true ? <button disabled="true" className="btn-primary" id="start_play_button">JOIN STREAM</button> :
                 <button onClick={stopStream} className="btn-primary" id="start_play_button">STOP STREAM</button>
               }
             </div>

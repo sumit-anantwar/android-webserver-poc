@@ -133,6 +133,7 @@ class WebRtcPeerConnection(
         dataChannel.registerObserver(object : DataChannel.Observer {
             override fun onBufferedAmountChange(l: Long) {}
             override fun onStateChange() {
+                Timber.d("Daya Channel State changed")
             }
 
             override fun onMessage(buffer: DataChannel.Buffer) {

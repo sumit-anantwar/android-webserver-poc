@@ -3,30 +3,25 @@ package com.example.web_server_poc
 import android.content.Context
 import android.net.wifi.WifiInfo
 import android.net.wifi.WifiManager
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
-import android.webkit.WebView
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import com.example.web_server_poc.databinding.ActivityMainBinding
 import com.example.web_server_poc.utils.PermissionUtils
-import com.example.web_server_poc.utils.onIoThread
 import com.example.web_server_poc.utils.onMainThread
 import com.example.web_server_poc.webrtc.WebRtcPresenter
 import com.example.web_server_poc.webserver.WebServer
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.MultiFormatWriter
 import com.journeyapps.barcodescanner.BarcodeEncoder
-import com.tbruyelle.rxpermissions3.RxPermissions
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import timber.log.Timber
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
+import java.net.NetworkInterface
+import java.net.SocketException
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -81,7 +76,7 @@ class MainActivity : AppCompatActivity() {
             e.printStackTrace()
         }
 
-        val ipAddress = getLocalIpAddress(this)
+        val ipAddress = getHotSpotIpAddress()
         textview_IP.text = String.format("%s:%d", ipAddress, port)
         val streamUrl = "http://$ipAddress:$port"
         try {
@@ -125,5 +120,33 @@ class MainActivity : AppCompatActivity() {
         )
 
         return ipString
+    }
+
+    private fun getHotSpotIpAddress(): String? {
+        var ip = ""
+        try {
+            val enumNetworkInterfaces = NetworkInterface
+                .getNetworkInterfaces()
+            while (enumNetworkInterfaces.hasMoreElements()) {
+                val networkInterface = enumNetworkInterfaces
+                    .nextElement()
+                val enumInetAddress = networkInterface
+                    .inetAddresses
+                while (enumInetAddress.hasMoreElements()) {
+                    val inetAddress = enumInetAddress.nextElement()
+                    if (inetAddress.isSiteLocalAddress) {
+                        ip += """
+                        SiteLocalAddress: ${inetAddress.hostAddress}
+                        
+                        """.trimIndent()
+                    }
+                }
+            }
+        } catch (e: SocketException) {
+            // TODO Auto-generated catch block
+            e.printStackTrace()
+            ip += "Something Wrong! $e\n"
+        }
+        return ip
     }
 }
