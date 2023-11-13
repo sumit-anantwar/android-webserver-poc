@@ -1,0 +1,17 @@
+{
+  "files": {
+    "main.css": "/static/css/main.5746b2e5.css",
+    "main.js": "/static/js/main.98c9e5b0.js",
+    "static/media/red-x-icon.png": "/static/media/red-x-icon.c7d4783097bdee6b1035.png",
+    "static/media/vox_logo.svg": "/static/media/vox_logo.676ce51592d26e2fe9739b74791b627a.svg",
+    "index.html": "/index.html",
+    "static/media/message_btn.svg": "/static/media/message_btn.dd971b6d7b13d41d238118b976ddcb22.svg",
+    "static/media/edit_white_24dp.svg": "/static/media/edit_white_24dp.83e859470da2612c0204c969540ae518.svg",
+    "main.5746b2e5.css.map": "/static/css/main.5746b2e5.css.map",
+    "main.98c9e5b0.js.map": "/static/js/main.98c9e5b0.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.5746b2e5.css",
+    "static/js/main.98c9e5b0.js"
+  ]
+}
