@@ -1,9 +1,5 @@
-import { useEffect, useRef, useState } from "react";
-import { sendOffer, testGoogle } from "./axios/requests";
-import adapter from 'webrtc-adapter';
 import "./Player.css"
 import logo from "./images/vox_logo.svg";
-import { RotatingLines } from "react-loader-spinner";
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 const JoinStream = (props) => {
   const history = useHistory()

@@ -3,7 +3,7 @@ import { sendOffer, testGoogle } from "./axios/requests";
 import adapter from 'webrtc-adapter';
 import "./Player.css"
 import logo from "./images/vox_logo.svg";
-import { RotatingLines } from "react-loader-spinner";
+// import { RotatingLines } from "react-loader-spinner";
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 const PlayStream = (props) => {
   const history = useHistory()
@@ -23,13 +23,14 @@ const PlayStream = (props) => {
     console.log("Loading Spinner");
     return (
       <header className="App-header">
-        <RotatingLines
+        <o>Connecting...</o>
+        {/* <RotatingLines
           strokeColor="grey"
           strokeWidth="5"
           animationDuration="0.75"
           width="96"
           visible={true}
-        />
+        /> */}
       </header>
     );
   };
